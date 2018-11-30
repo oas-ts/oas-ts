@@ -26,6 +26,7 @@
     "contributors-generate": "all-contributors generate"
   },
   "dependencies": {
+    "@ts-task/fs": "^1.0.1",
     "tsns": "0.0.18",
     "typescript": "3.0.1"
   },

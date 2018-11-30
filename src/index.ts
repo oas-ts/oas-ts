@@ -1,16 +1,53 @@
-import * as os from 'os';
-import {readFile} from 'fs';
-import {add} from './foo/foo';
 
-readFile('./package.json', (err, packageStr) => {
-    if (err) {
-        console.error('There was a problem reading package json', err);
-        return;
+interface RestifyEndpoints {
+    get: any;
+    post: any;
+}
+
+interface PetsEndpoints {
+    get: {
+        '/pets': 'lista pets',
+        '/pets/{petId}': {
+            queryParams: {
+                'petId': number
+            }
+        }
+    };
+    post: {
+        '/pets': {
+            body: {
+                id: number;
+                name: string;
+            }
+        }
+    };
+}
+const rest = restify<PetsEndpoints>();
+
+type RestifyResponse = unknown;
+
+function restify<T extends RestifyEndpoints> () {
+    return {
+        get: (url: PossibleEndpoints<T, 'get'>, options?: any): RestifyResponse => 'hola',
+        post: (url: PossibleEndpoints<T, 'post'>, options?: any): RestifyResponse => 'hola',
+    };
+}
+
+type Methods = 'get' | 'post';
+
+type PossibleEndpoints <Spec extends RestifyEndpoints, Method extends Methods> =
+    keyof Spec[Method];
+
+
+// /pets
+// /pets/{petId}
+rest.get('/pets');
+rest.get('/pets/{petId}', {
+    params: {
+        petId: 28
     }
-
-    const json = JSON.parse(packageStr.toString());
-
-    console.log(`Running typescript-node-starter version ${json.version}`);
-    console.info(`Running on ${os.hostname()} with ${os.cpus().length} CPU's and ${os.totalmem()} mem`);
-    console.info(`1 + 1 = ${add(1, 1)}`);
 });
+
+rest.post('/pets');
+
+// rest.get('buu');

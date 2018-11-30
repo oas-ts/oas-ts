@@ -1,4 +1,7 @@
 {
-    "extends": "tslint-config-acamica"
+    "extends": "tslint-config-acamica",
+    "rules": {
+        "interface-name":false
+    }
 }
 

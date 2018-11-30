@@ -1,57 +1,98 @@
-
 interface RestifyEndpoints {
     get: any;
     post: any;
+    put: any;
+}
+
+interface NewPet {
+    name: string;
+    tag?: string;
+}
+
+interface Pet {
+    id: number;
+    name: string;
+    tag?: string;
 }
 
 interface PetsEndpoints {
+    put: {
+        '/ping': {
+            options: undefined
+        }
+    };
     get: {
         '/pets': {
-            queryParams: {
-                // How many items to return at one time (max 100)
-                limit?: number
+            options: {
+                queryParams: {
+                    /** How many items to return at one time (max 100) */
+                    limit?: number,
+                    /** Tags to filter by */
+                    tags?: string[];
+                }
             }
         },
         '/pets/{petId}': {
-            pathParams: {
-                /** The id of the pet to retrieve */
-                'petId': number
+            options: {
+                pathParams: {
+                    /** The id of the pet to retrieve */
+                    'petId': number
+                }
             }
+        },
+        '/ping': {
+            options: undefined
         }
+
     };
     post: {
         '/pets': {
-            body: {
-                id: number;
-                name: string;
+            options: {
+                requestBody: NewPet
             }
         }
     };
 }
+
 const rest = restify<PetsEndpoints>();
 
 type RestifyResponse = unknown;
 
+
 function restify<T extends RestifyEndpoints> () {
     return {
-        get: <Route extends PossibleEndpoints<T, 'get'>> (url: Route, options?: EnpointOptions<T, 'get', Route>): RestifyResponse => 'hola',
-        post: (url: PossibleEndpoints<T, 'post'>, options?: any): RestifyResponse => 'hola',
+        put: <Route extends PossibleEndpoints<T, 'put'>> (url: Route, ...options: EndpointOptions<T, 'put', Route>): RestifyResponse => 'hola',
+        get : <Route extends PossibleEndpoints<T, 'get'>> (url: Route, ...options: EndpointOptions<T, 'get', Route>): RestifyResponse => 'hola',
+        post : <Route extends PossibleEndpoints<T, 'post'>> (url: Route, ...options: EndpointOptions<T, 'post', Route>): RestifyResponse => 'hola'
     };
 }
 
-type Methods = 'get' | 'post';
+type Methods = 'get' | 'post' | 'put';
 
-type PossibleEndpoints <Spec extends RestifyEndpoints, Method extends Methods> =
-    keyof Spec[Method];
+type PossibleEndpoints <
+    Spec extends RestifyEndpoints,
+    Method extends Methods
+> =
+    keyof Spec[Method]
+;
 
-type EnpointOptions <Spec extends RestifyEndpoints, Method extends Methods, Route extends PossibleEndpoints<Spec, Method>> =
-    Spec[Method][Route];
+type EndpointOptions <
+    Spec extends RestifyEndpoints,
+    Method extends Methods,
+    Route extends PossibleEndpoints<Spec, Method>
+> =
+    Spec[Method][Route]['options'] extends undefined
+        ? [undefined?]
+        : [Spec[Method][Route]['options']]
+;
 
 // /pets
 // /pets/{petId}
+
 rest.get('/pets', {
     queryParams: {
-
+        limit: 20,
+        tags: ['lazy']
     }
 });
 rest.get('/pets/{petId}', {
@@ -60,6 +101,11 @@ rest.get('/pets/{petId}', {
     }
 });
 
-rest.post('/pets');
+rest.get('/ping');
+rest.put('/ping');
 
-// rest.get('buu');
+rest.post('/pets', {
+    requestBody: {
+        name: 'vilma'
+    }
+});

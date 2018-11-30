@@ -6,9 +6,15 @@ interface RestifyEndpoints {
 
 interface PetsEndpoints {
     get: {
-        '/pets': 'lista pets',
-        '/pets/{petId}': {
+        '/pets': {
             queryParams: {
+                // How many items to return at one time (max 100)
+                limit?: number
+            }
+        },
+        '/pets/{petId}': {
+            pathParams: {
+                /** The id of the pet to retrieve */
                 'petId': number
             }
         }
@@ -28,7 +34,7 @@ type RestifyResponse = unknown;
 
 function restify<T extends RestifyEndpoints> () {
     return {
-        get: (url: PossibleEndpoints<T, 'get'>, options?: any): RestifyResponse => 'hola',
+        get: <Route extends PossibleEndpoints<T, 'get'>> (url: Route, options?: EnpointOptions<T, 'get', Route>): RestifyResponse => 'hola',
         post: (url: PossibleEndpoints<T, 'post'>, options?: any): RestifyResponse => 'hola',
     };
 }
@@ -38,12 +44,18 @@ type Methods = 'get' | 'post';
 type PossibleEndpoints <Spec extends RestifyEndpoints, Method extends Methods> =
     keyof Spec[Method];
 
+type EnpointOptions <Spec extends RestifyEndpoints, Method extends Methods, Route extends PossibleEndpoints<Spec, Method>> =
+    Spec[Method][Route];
 
 // /pets
 // /pets/{petId}
-rest.get('/pets');
+rest.get('/pets', {
+    queryParams: {
+
+    }
+});
 rest.get('/pets/{petId}', {
-    params: {
+    pathParams: {
         petId: 28
     }
 });

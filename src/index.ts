@@ -15,11 +15,14 @@ interface Pet {
     tag?: string;
 }
 
+interface UnknownResponseError {
+    code: number;
+    message: string;
+}
+
 interface PetsEndpoints {
     put: {
-        '/ping': {
-            options: undefined
-        }
+
     };
     get: {
         '/pets': {
@@ -30,6 +33,13 @@ interface PetsEndpoints {
                     /** Tags to filter by */
                     tags?: string[];
                 }
+            },
+            responses: {
+                code: 200;
+                json: Pet[];
+            } | {
+                code: number;
+                json: UnknownResponseError
             }
         },
         '/pets/{petId}': {
@@ -38,10 +48,25 @@ interface PetsEndpoints {
                     /** The id of the pet to retrieve */
                     'petId': number
                 }
+            },
+            responses: {
+                code: 200;
+                json: Pet;
+            } | {
+                code: number;
+                json: UnknownResponseError
             }
         },
         '/ping': {
-            options: undefined
+            options: undefined,
+            responses: {
+                code: 200;
+                json: Pet;
+            } | {
+                code: number;
+                json: UnknownResponseError
+            }
+
         }
 
     };
@@ -49,6 +74,13 @@ interface PetsEndpoints {
         '/pets': {
             options: {
                 requestBody: NewPet
+            },
+            responses: {
+                code: 200;
+                json: Pet;
+            } | {
+                code: number;
+                json: UnknownResponseError
             }
         }
     };
@@ -56,18 +88,21 @@ interface PetsEndpoints {
 
 const rest = restify<PetsEndpoints>();
 
-type RestifyResponse = unknown;
-
-
-function restify<T extends RestifyEndpoints> () {
+function restify<Spec extends RestifyEndpoints> () {
     return {
-        put: <Route extends PossibleEndpoints<T, 'put'>> (url: Route, ...options: EndpointOptions<T, 'put', Route>): RestifyResponse => 'hola',
-        get : <Route extends PossibleEndpoints<T, 'get'>> (url: Route, ...options: EndpointOptions<T, 'get', Route>): RestifyResponse => 'hola',
-        post : <Route extends PossibleEndpoints<T, 'post'>> (url: Route, ...options: EndpointOptions<T, 'post', Route>): RestifyResponse => 'hola'
+        put: <Route extends PossibleEndpoints<Spec, 'put'>> (url: Route, ...options: EndpointOptions<Spec, 'put', Route>): EndpointResponse<Spec, 'put', Route> => 'hola',
+        get: <Route extends PossibleEndpoints<Spec, 'get'>> (url: Route, ...options: EndpointOptions<Spec, 'get', Route>): EndpointResponse<Spec, 'get', Route> => 'hola',
+        post: <Route extends PossibleEndpoints<Spec, 'post'>> (url: Route, ...options: EndpointOptions<Spec, 'post', Route>): EndpointResponse<Spec, 'post', Route> => 'hola'
     };
 }
 
 type Methods = 'get' | 'post' | 'put';
+
+type EndpointResponse <
+    Spec extends RestifyEndpoints,
+    Method extends Methods,
+    Route extends PossibleEndpoints<Spec, Method>
+> = Spec[Method][Route]['responses'];
 
 type PossibleEndpoints <
     Spec extends RestifyEndpoints,
@@ -86,23 +121,21 @@ type EndpointOptions <
         : [Spec[Method][Route]['options']]
 ;
 
-// /pets
-// /pets/{petId}
 
-rest.get('/pets', {
+const pets = rest.get('/pets', {
     queryParams: {
         limit: 20,
         tags: ['lazy']
     }
 });
+
 rest.get('/pets/{petId}', {
     pathParams: {
         petId: 28
     }
 });
 
-rest.get('/ping');
-rest.put('/ping');
+const ping = rest.get('/ping');
 
 rest.post('/pets', {
     requestBody: {

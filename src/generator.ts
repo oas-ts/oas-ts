@@ -1,51 +1,51 @@
-import { undef } from 'parmenides';
 import ts = require('typescript');
 
-export interface Pet {
-    id: number;
-    name: string;
-    tag?: string;
+// --------
+// PROGRAM
+// --------
+
+interface ProgramDefinition {
+    schemas: SchemaDefinitions;
+    export: ExportOptions;
+    endpoints: EndpointDefinitions;
 }
 
-function createSchemas () {
-    const interfaceName = 'Pet';
-
-    const members = [
-        ts.createPropertySignature(
-            /*modifiers*/ undefined,
-            'id',
-            /*questionToken */undefined,
-            ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-            // ts.SyntaxKind.NumberKeyword,
-            undefined
-        ),
-        ts.createPropertySignature(
-            /*modifiers*/ undefined,
-            'name',
-            /*questionToken */undefined,
-            ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-            // ts.SyntaxKind.NumberKeyword,
-            undefined
-        ),
-        ts.createPropertySignature(
-            /*modifiers*/ undefined,
-            'tag',
-            ts.createToken(ts.SyntaxKind.QuestionToken),
-            ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-            // ts.SyntaxKind.NumberKeyword,
-            undefined
-        )
-    ];
-    return [
-        ts.createInterfaceDeclaration(
-        /*decorators*/ undefined,
-        /*modifiers*/ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-        interfaceName,
-        /*typeParameters*/ undefined,
-        /*heritageClauses*/ undefined,
-        members
-    )];
+function createProgram (source: ts.SourceFile, definition: ProgramDefinition) {
+    return ts.updateSourceFileNode(
+        source,
+        [
+            createImports(),
+            ...createSchemas(definition.schemas),
+            createEndpoints(definition.endpoints),
+            exportDefault(definition.export)
+        ],
+        false
+    );
 }
+
+export function generateProgram (programName: string, programDefinition: ProgramDefinition) {
+    const resultFile = ts.createSourceFile(
+        programName,
+        '',
+        ts.ScriptTarget.Latest,
+        /*setParentNodes*/ false,
+        ts.ScriptKind.TS
+      );
+
+      const printer = ts.createPrinter({
+        newLine: ts.NewLineKind.LineFeed
+      });
+
+      return printer.printNode(
+        ts.EmitHint.Unspecified,
+        createProgram(resultFile, programDefinition),
+        resultFile
+      );
+}
+
+// --------
+// IMPORTS
+// --------
 
 function createImports () {
     return ts.createImportDeclaration(
@@ -56,26 +56,56 @@ function createImports () {
             ts.createImportSpecifier(undefined, ts.createIdentifier('RestifyEndpoints'))
 
         ])),
-        ts.createStringLiteral('./restify')
+        /*moduleSpecifier*/ ts.createStringLiteral('./restify')
     );
 }
 
-function exportDefault () {
-    const restifyOptions = ts.createObjectLiteral([
-            ts.createPropertyAssignment('servers', ts.createStringLiteral('http://192.168.1.11:3000'))
-    ]);
+// --------
+// SCHEMAS
+// --------
 
-    return ts.createExportAssignment(
-        /*decorators*/ undefined,
-        /*modifiers*/ undefined,
-        /*isExportEquals*/false,
-        ts.createCall(
-            ts.createIdentifier('restify'),
-            [ts.createTypeReferenceNode('PetsEndpoints', [])],
-            [restifyOptions]
+interface SchemaDefinition {
+    name: string;
+    properties: Array<{
+        name: string;
+        // TODO: type shouldn't be string, it should be something closer to either schema or ts definitions
+        type: string;
+        optional: boolean;
+        // description?
+
+    }>;
+}
+
+type SchemaDefinitions = SchemaDefinition[];
+function createSchemas (definitions: SchemaDefinitions) {
+    return definitions.map(createSchema);
+}
+
+function createSchema (definition: SchemaDefinition) {
+
+    const members = definition.properties.map(prop =>
+        ts.createPropertySignature(
+            /*modifiers*/ undefined,
+            prop.name,
+            optionalToken(prop.optional),
+            /*type*/ mapTypes(prop.type),
+            /*initializer*/ undefined
         )
     );
+
+    return ts.createInterfaceDeclaration(
+        /*decorators*/ undefined,
+        /*modifiers*/ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+        definition.name,
+        /*typeParameters*/ undefined,
+        /*heritageClauses*/ undefined,
+        members
+    );
 }
+
+// ----------
+// ENDPOINTS
+// ----------
 
 interface RouteOptionsDefinition {
     pathParams?: Record<string, {
@@ -161,6 +191,10 @@ function createRouteOptionsPathParams (options: RouteOptionsDefinition) {
     ];
 }
 
+function optionalToken (thrutly: boolean) {
+    return thrutly ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined;
+}
+
 function createRouteOptionsQueryParams (options: RouteOptionsDefinition) {
     const paramsDefinition = options.queryParams;
     if (typeof paramsDefinition === 'undefined') {
@@ -171,7 +205,7 @@ function createRouteOptionsQueryParams (options: RouteOptionsDefinition) {
         const definition = ts.createPropertySignature(
             /*modifiers*/ undefined,
             param,
-            /*questionToken*/ paramsDefinition[param].optional ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+            optionalToken(paramsDefinition[param].optional),
             /*type*/ mapTypes(paramsDefinition[param].type),
             /*initializer*/ undefined
         );
@@ -244,6 +278,8 @@ function createRoute (path: string, definition: RouteDefinition) {
         /*initializer*/ undefined
     );
 }
+
+
 function createVerbEndpoints (verb: string, routes: Record<string, RouteDefinition>) {
     const nodeRoutes = Object.keys(routes).map(path => createRoute(path, routes[path]));
     return ts.createPropertySignature(
@@ -255,13 +291,122 @@ function createVerbEndpoints (verb: string, routes: Record<string, RouteDefiniti
     );
 }
 
-function createEndpoints () {
-    const interfaceName = 'PetsEndpoints';
+interface EndpointDefinitions {
+    name: string;
+    routes: Record<string, Record<string, RouteDefinition>>;
+}
 
-    const members = [
-        createVerbEndpoints('put', {
-        }),
-        createVerbEndpoints('get', {
+function createEndpoints (definition: EndpointDefinitions) {
+    const members =
+        Object
+            .keys(definition.routes)
+            .map(verb => createVerbEndpoints(verb, definition.routes[verb]));
+
+    return ts.createInterfaceDeclaration(
+        /*decorators*/ undefined,
+        /*modifiers*/ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+        definition.name,
+        /*typeParameters*/ undefined,
+        /*heritageClauses*/ [ts.createHeritageClause(
+            ts.SyntaxKind.ExtendsKeyword,
+            [
+                ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier('RestifyEndpoints'))
+            ]
+        )],
+        members
+    );
+}
+
+// --------------
+// EXPORT DEFAULT
+// --------------
+
+interface ExportOptions {
+    servers: string;
+}
+
+function exportDefault (options: ExportOptions) {
+    const restifyOptions = ts.createObjectLiteral([
+            ts.createPropertyAssignment('servers', ts.createStringLiteral(options.servers))
+    ]);
+
+    return ts.createExportAssignment(
+        /*decorators*/ undefined,
+        /*modifiers*/ undefined,
+        /*isExportEquals*/false,
+        ts.createCall(
+            ts.createIdentifier('restify'),
+            [ts.createTypeReferenceNode('PetsEndpoints', [])],
+            [restifyOptions]
+        )
+    );
+}
+
+
+// ----
+// TEST
+// ----
+
+const Pet: SchemaDefinition = {
+    name: 'Pet',
+    properties: [
+        {
+            name: 'id',
+            type: 'number',
+            optional: false
+        },
+        {
+            name: 'name',
+            type: 'string',
+            optional: false
+        },
+        {
+            name: 'tag',
+            type: 'string',
+            optional: true
+        }
+    ]
+};
+
+const UnknownResponseError: SchemaDefinition = {
+    name: 'UnknownResponseError',
+    properties: [
+        {
+            name: 'code',
+            type: 'number',
+            optional: false
+        },
+        {
+            name: 'message',
+            type: 'string',
+            optional: false
+        }
+    ]
+};
+
+const newPets: SchemaDefinition = {
+    name: 'NewPet',
+    properties: [
+        {
+            name: 'name',
+            type: 'string',
+            optional: false
+        },
+        {
+            name: 'tag',
+            type: 'string',
+            optional: true
+        }
+    ]
+};
+
+const endpointsDefinitions: EndpointDefinitions = {
+    name: 'PetsEndpoints',
+    routes: {
+        'put': {
+
+        },
+        'get': {
             '/pets': {
                 options: {
                     queryParams: {
@@ -293,63 +438,24 @@ function createEndpoints () {
             '/ping': {
                 responses: []
             }
-        }),
-        createVerbEndpoints('post', {
+        },
+        'post': {
             '/pets': {
                 responses: []
             }
-        })
-    ];
-    return ts.createInterfaceDeclaration(
-        /*decorators*/ undefined,
-        /*modifiers*/ [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-        interfaceName,
-        /*typeParameters*/ undefined,
-        /*heritageClauses*/ [ts.createHeritageClause(
-            ts.SyntaxKind.ExtendsKeyword,
-            [
-                ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier('RestifyEndpoints'))
-            ]
-        )],
-        members
-    );
-}
-// comments
-// ts.addSyntheticLeadingComment(
-//     NODE,
-//     ts.SyntaxKind.MultiLineCommentTrivia,
-//     'hello',
-//     true
-// )
+        }
+    }
+};
 
-function createProgram (source: ts.SourceFile) {
-    return ts.updateSourceFileNode(
-        source,
-        [
-            createImports(),
-            ...createSchemas(),
-            createEndpoints(),
-            exportDefault()
-        ],
-        false
-    );
-}
-
-const resultFile = ts.createSourceFile(
-  'someFileName.ts',
-  '',
-  ts.ScriptTarget.Latest,
-  /*setParentNodes*/ false,
-  ts.ScriptKind.TS
-);
-
-const printer = ts.createPrinter({
-  newLine: ts.NewLineKind.LineFeed
-});
-const result = printer.printNode(
-  ts.EmitHint.Unspecified,
-  createProgram(resultFile),
-  resultFile
+const result = generateProgram(
+    'pet-spec.ts',
+    {
+        schemas: [newPets, Pet, UnknownResponseError],
+        export: {
+            servers: 'http://192.168.1.11:3000'
+        },
+        endpoints: endpointsDefinitions
+    }
 );
 
 console.log(result);

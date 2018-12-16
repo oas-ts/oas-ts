@@ -5,6 +5,10 @@
         "outDir": "dist",
         "strict": true,
         "noUnusedLocals": false,
-        "sourceMap": true
+        "sourceMap": true,
+        "baseUrl": ".",
+        "paths": {
+            "restify": ["./src/restify"]
+        }
     }
 }

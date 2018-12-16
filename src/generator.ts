@@ -56,7 +56,7 @@ function createImports () {
             ts.createImportSpecifier(undefined, ts.createIdentifier('RestifyEndpoints'))
 
         ])),
-        /*moduleSpecifier*/ ts.createStringLiteral('./restify')
+        /*moduleSpecifier*/ ts.createStringLiteral('restify')
     );
 }
 
@@ -257,7 +257,7 @@ function createRouteResponses (definition: RouteDefinition) {
 function createRoute (path: string, definition: RouteDefinition) {
     return ts.createPropertySignature(
         /*modifiers*/ undefined,
-        path,
+        ts.createStringLiteral(path),
         /*questionToken*/ undefined,
         ts.createTypeLiteralNode([
             ts.createPropertySignature(

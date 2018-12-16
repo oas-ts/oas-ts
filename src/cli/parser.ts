@@ -1,9 +1,7 @@
 import { readFile } from '@ts-task/fs';
 import { Task } from '@ts-task/task';
-import { anything, arrOf, bool, Contract, lit, objOf, oneOf, optional, str, union } from 'parmenides';
+import { anything, arrOf, bool, ContractOf, dictionaryOf, lit, objOf, oneOf, optional, str, union } from 'parmenides';
 import { join } from 'path';
-import { dictionaryOf } from './utils/parmenides/dictionary';
-
 
 class InvalidApiSpec {
     constructor (public err: Error) {
@@ -184,8 +182,6 @@ interface OpenAPI extends ContractOf<typeof specContract> {
     servers: ServerObject[] | undefined;
     paths: Record<string, PathItemObject>;
 }
-
-type ContractOf<T extends Contract<any>> = T extends Contract<infer C> ? C : never;
 
 type Verb = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
 const verbs = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'] as Verb[];

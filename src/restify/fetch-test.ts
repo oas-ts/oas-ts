@@ -4,8 +4,6 @@ import { json } from './restify';
 // Set node-fetch as a way to fetch in task-fetch
 dependencies.fetch = require('node-fetch');
 
-
-
 rest.get('/pets/{petId}', {
     pathParams: {
         petId: 1
@@ -16,7 +14,6 @@ rest.get('/pets/{petId}', {
 );
 
 const ping = rest.get('/ping');
-
 
 rest.post('/pets', {
         body: json({

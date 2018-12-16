@@ -28,9 +28,12 @@
   "dependencies": {
     "@ts-task/fetch": "^1.0.5",
     "@ts-task/fs": "^1.0.1",
+    "@types/ramda": "^0.25.43",
     "node-fetch": "^2.3.0",
+    "parmenides": "0.0.4",
+    "ramda": "^0.26.1",
     "tsns": "0.0.18",
-    "typescript": "3.0.1"
+    "typescript": "^3.2.2"
   },
   "devDependencies": {
     "@types/chai": "4.1.4",

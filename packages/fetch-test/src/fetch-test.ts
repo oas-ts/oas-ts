@@ -1,6 +1,6 @@
+import { json } from '@oas-ts/rest';
 import { dependencies } from '@ts-task/fetch';
 import rest from './pet-spec';
-import { json } from './rest';
 // Set node-fetch as a way to fetch in task-fetch
 dependencies.fetch = require('node-fetch');
 

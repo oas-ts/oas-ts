@@ -37,6 +37,7 @@ export interface RestifyEndpoints {
     get: EndpointSpecs;
     post: EndpointSpecs;
     put: EndpointSpecs;
+    delete: EndpointSpecs;
 }
 
 interface RestifyOptions {
@@ -106,10 +107,11 @@ export function restify<Spec extends RestifyEndpoints> (restifyOptions: RestifyO
         put: request('put') as Endpoint<Spec, 'put'>,
         get: request('get') as Endpoint<Spec, 'get'>,
         post: request('post') as Endpoint<Spec, 'post'>,
+        delete: request('delete') as Endpoint<Spec, 'delete'>,
 };
 }
 
-type Methods = 'get' | 'post' | 'put';
+type Methods = 'get' | 'post' | 'put' | 'delete';
 
 type EndpointResponse <
     Spec extends RestifyEndpoints,

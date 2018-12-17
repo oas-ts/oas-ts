@@ -1,0 +1,39 @@
+{
+  "name": "@oas-ts/cli",
+  "version": "0.0.0",
+  "description": "Command line tool that parses an open-api specification and generates code to be used by @oas-ts/rest and @oas-ts/restify",
+  "author": "Hernan Rajchert <hrajchert@gmail.com>",
+  "homepage": "https://github.com/hrajchert/openapi-test#readme",
+  "license": "MIT",
+  "main": "lib/cli.js",
+  "dependencies": {
+    "@ts-task/fetch": "^1.0.5",
+    "@ts-task/fs": "^1.0.1",
+    "@oas-ts/rest": "0.0.0",
+    "ramda": "^0.26.1",
+    "parmenides": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.25.43"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hrajchert/openapi-test.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc",
+    "lint": "tslint --project tsconfig.json",
+    "generator": "npm run build && node lib/generator > __tests__/generated/pet-spec.ts"
+  },
+  "bugs": {
+    "url": "https://github.com/hrajchert/openapi-test/issues"
+  }
+}

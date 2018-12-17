@@ -2,10 +2,11 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2015",
-        "outDir": "dist",
         "strict": true,
         "noUnusedLocals": false,
+        "declaration": true,
         "sourceMap": true,
-        "baseUrl": "."
+        "baseUrl": ".",
+        "lib": ["es2015", "dom"],
     }
 }

@@ -1,0 +1,35 @@
+{
+  "name": "@oas-ts/rest",
+  "version": "0.0.0",
+  "description": "Library to consume a restful API compiled with @oas-ts/cli",
+  "author": "Hernan Rajchert <hrajchert@gmail.com>",
+  "homepage": "https://github.com/hrajchert/openapi-test#readme",
+  "license": "MIT",
+  "main": "lib/rest.js",
+  "typings": "lib/rest.d.ts",
+  "dependencies": {
+    "@ts-task/fetch": "^1.0.5",
+    "node-fetch": "^2.3.0",
+    "typescript": "^3.2.2"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hrajchert/openapi-test.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc",
+    "lint": "tslint --project tsconfig.json",
+    "start": "node lib/fetch-test"
+  },
+  "bugs": {
+    "url": "https://github.com/hrajchert/openapi-test/issues"
+  }
+}

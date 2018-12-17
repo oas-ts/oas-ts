@@ -56,7 +56,7 @@ function createImports () {
             ts.createImportSpecifier(undefined, ts.createIdentifier('RestifyEndpoints'))
 
         ])),
-        /*moduleSpecifier*/ ts.createStringLiteral('restify')
+        /*moduleSpecifier*/ ts.createStringLiteral('@oas-ts/rest')
     );
 }
 

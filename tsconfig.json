@@ -6,9 +6,6 @@
         "strict": true,
         "noUnusedLocals": false,
         "sourceMap": true,
-        "baseUrl": ".",
-        "paths": {
-            "restify": ["./src/restify"]
-        }
+        "baseUrl": "."
     }
 }

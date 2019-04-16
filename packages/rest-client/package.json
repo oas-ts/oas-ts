@@ -1,5 +1,5 @@
 {
-  "name": "@oas-ts/rest",
+  "name": "@oas-ts/rest-client",
   "version": "0.0.0",
   "description": "Library to consume a restful API compiled with @oas-ts/cli",
   "author": "Hernan Rajchert <hrajchert@gmail.com>",

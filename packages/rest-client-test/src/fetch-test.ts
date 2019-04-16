@@ -1,4 +1,4 @@
-import { json } from '@oas-ts/rest';
+import { json } from '@oas-ts/rest-client';
 import { dependencies } from '@ts-task/fetch';
 import rest from './pet-spec';
 

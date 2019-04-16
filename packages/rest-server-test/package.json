@@ -1,12 +1,12 @@
 {
-  "name": "fetch-test",
+  "name": "rest-server-test",
   "version": "0.0.0",
-  "description": "Testing example of the rest specification",
+  "description": "> TODO: description",
   "author": "Hernan Rajchert <hrajchert@gmail.com>",
   "homepage": "https://github.com/hrajchert/openapi-test#readme",
   "license": "MIT",
-  "main": "lib/fetch-test.js",
   "private": true,
+  "main": "lib/restify-test.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -14,21 +14,22 @@
   "files": [
     "lib"
   ],
+  "dependencies": {
+    "parmenides": "0.1.0",
+    "restify": "^7.2.3"
+  },
+  "devDependencies": {
+    "@types/restify": "^7.2.6"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hrajchert/openapi-test.git"
   },
-  "dependencies": {
-    "@oas-ts/rest": "0.0.0",
-    "@ts-task/fetch": "^1.0.6",
-    "node-fetch": "^2.3.0"
-  },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
+    "start": "node lib/index",
     "build": "tsc",
-    "lint": "tslint --project tsconfig.json",
-    "dtslint": "dtslint __tests__/types",
-    "start": "node lib/fetch-test"
+    "lint": "tslint --project tsconfig.json"
   },
   "bugs": {
     "url": "https://github.com/hrajchert/openapi-test/issues"

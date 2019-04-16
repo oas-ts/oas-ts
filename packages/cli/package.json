@@ -1,7 +1,7 @@
 {
   "name": "@oas-ts/cli",
   "version": "0.0.0",
-  "description": "Command line tool that parses an open-api specification and generates code to be used by @oas-ts/rest and @oas-ts/restify",
+  "description": "Command line tool that parses an open-api specification and generates code to be used by other @oas-ts packages",
   "author": "Hernan Rajchert <hrajchert@gmail.com>",
   "homepage": "https://github.com/hrajchert/openapi-test#readme",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "dependencies": {
     "@ts-task/fetch": "^1.0.6",
     "@ts-task/fs": "^1.0.1",
-    "@oas-ts/rest": "0.0.0",
+    "@oas-ts/rest-client": "0.0.0",
     "ramda": "^0.26.1",
     "parmenides": "^0.1.0"
   },

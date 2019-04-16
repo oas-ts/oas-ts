@@ -20,11 +20,11 @@ $ lerna run build
 
 To run the backend example you can execute
 ```
-$ lerna run --stream --scope restify-test start
+$ lerna run --stream --scope rest-server-test start
 ```
 
 And to try the client you can execute
 
 ```
-$ lerna run --stream --scope fetch-test start
+$ lerna run --stream --scope rest-client-test start
 ```

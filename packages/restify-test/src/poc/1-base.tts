@@ -1,0 +1,23 @@
+export function createServer<AllRoutes extends string>() {
+
+    function registerAllEndpoints<ProvidedRoutes extends string>(routes: ProvidedRoutes[]) {
+
+    }
+
+    function createValidatedEndpoint(...magic) {
+
+    }
+    return {
+        registerAllRoutes: registerAllEndpoints,
+        createValidatedEndpoint
+    }
+}
+
+// Pass the Type parameter in here
+const {registerAllRoutes} = createServer<'A' | 'B' | 'C'>();
+
+// Use type inference here
+registerAllRoutes(['A', 'B', 'C']); // Ok
+registerAllRoutes(['A', 'C', 'B']); // Ok
+registerAllRoutes(['A', 'B', 'C', 'C']); // Ok (but ideally not)
+registerAllRoutes(['A', 'B']); // Error, missing C

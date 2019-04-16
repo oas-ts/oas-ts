@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "lib/cli.js",
   "dependencies": {
-    "@ts-task/fetch": "^1.0.5",
+    "@ts-task/fetch": "^1.0.6",
     "@ts-task/fs": "^1.0.1",
     "@oas-ts/rest": "0.0.0",
     "ramda": "^0.26.1",

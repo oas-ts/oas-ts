@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@oas-ts/rest": "0.0.0",
-    "@ts-task/fetch": "^1.0.5",
+    "@ts-task/fetch": "^1.0.6",
     "node-fetch": "^2.3.0"
   },
   "scripts": {

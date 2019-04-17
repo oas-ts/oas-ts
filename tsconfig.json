@@ -7,6 +7,6 @@
         "declaration": true,
         "sourceMap": true,
         "baseUrl": ".",
-        "lib": ["es2015", "dom"],
+        "lib": ["es2017", "dom"],
     }
 }

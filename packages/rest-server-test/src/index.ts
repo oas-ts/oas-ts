@@ -1,6 +1,6 @@
 import { Task } from '@ts-task/task';
-import { map } from '@ts-task/task/dist/lib/src/operators';
-import { arrOf, ContractOf } from 'parmenides';
+import { chain, map } from '@ts-task/task/dist/lib/src/operators';
+import { ContractOf } from 'parmenides';
 import { NotFoundError } from './http-errors';
 import { default as createRest, petContract } from './pet-spec';
 import { tap } from './utils/task-utils/tap';
@@ -13,8 +13,10 @@ const rest = createRest();
 
 const ping = rest.get('/ping', treq => treq.map(_ => 'pong'));
 
+type Pet = ContractOf<typeof petContract>;
 
-const pets = arrOf(petContract)([{
+// We store the pets in memory for the moment.
+const pets: Pet[] = [{
     id: 1,
     name: 'Bobby',
     tag: 'crazy'
@@ -22,12 +24,11 @@ const pets = arrOf(petContract)([{
     id: 2,
     name: 'Manuelita',
     tag: 'slow'
-}]);
+}];
 
-type Pet = ContractOf<typeof petContract>;
-
-// If the query has a filter, show the pets who have a tag
-// in the list of tags
+// Filter predicate:
+//   If we have a tags array, show the pets whose tag is
+//   in the list.
 const byTag = (tags: string[] | undefined, pet: Pet) =>
     tags === undefined || pet.tag && tags.includes(pet.tag)
 ;
@@ -46,26 +47,27 @@ const listPets = rest.get('/pets', treq =>
     )
 );
 
-
 const getPet = rest.get('/pets/{petId}', treq =>
-    // TODO: refactor using pipe (tap, map, chain)
-    treq.chain(req => {
-        console.log('getPet {petId}', req.params.petId, typeof req.params.petId);
+    treq.pipe(
+        tap(req => console.log('getPet {petId}', req.params.petId, typeof req.params.petId)),
+        chain(req => {
+            const pet = pets.find(aPet => aPet.id === req.params.petId);
 
-        const pet = pets.find(aPet => aPet.id === req.params.petId);
-
-        if (!pet) {
-            return Task.reject(new NotFoundError(`Pet with id ${req.params.petId} does not exist`));
-        }
-        return Task.resolve(pet);
-    })
+            if (!pet) {
+                return Task.reject(new NotFoundError(`Pet with id ${req.params.petId} does not exist`));
+            } else {
+                return Task.resolve(pet);
+            }
+        })
+    )
 );
+// server.get('/pets/{petId}', (req, res) => {
 //     if (isNaN(req.params && req.params.petId)) {
 //         return res.send(400, {
 //             message: 'Invalid petId'
 //         });
 //     }
-//
+//     console.log('getPet {petId}', req.params.petId, typeof req.params.petId)
 //     const pet = pets.find(aPet => aPet.id === Number(req.params.petId));
 //
 //     if (!pet) {

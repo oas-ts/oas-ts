@@ -211,7 +211,7 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             routesDefinitions.forEach(definition => registerRoute(definition as Endpoints));
         }
 
-        function validateRequest <Spec extends EndpointSpec> (contracts: RouteContracts, req: Request): Task<ValidatedRequest<Spec['options']>, any> {
+        function validateRequest <Spec extends EndpointSpec> (contracts: RouteContracts, req: Request): Task<ValidatedRequest<Spec['options']>, BadRequestError | UnknownError> {
             return Task.resolve(req).pipe(
                 tryCatch(
                     req => Object.assign(
@@ -235,7 +235,7 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             Method extends Methods,
             Route extends PossibleEndpoints<Spec, Method>
         > =
-            (req: Task<ValidatedRequest<Spec[Method][Route]['options']>, any>) => EndpointResponse<Spec, Method, Route>
+            (req: Task<ValidatedRequest<Spec[Method][Route]['options']>, BadRequestError | UnknownError>) => EndpointResponse<Spec, Method, Route>
         ;
         function createValidatedEndpoint <M extends Methods, R extends PossibleEndpoints<Spec, M>> (method: M, route: R, cb: RequestHandler<Spec, M, R>): RouteDefinition<Spec, M, R> {
             return {

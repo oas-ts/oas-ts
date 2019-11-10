@@ -34,7 +34,7 @@ const byTag = (tags: string[] | undefined, pet: Pet) =>
 
 const listPets = rest.get('/pets', treq =>
     treq.pipe(
-        tap(req => console.log('listPets query!', req.query)),
+        tap(req => console.log('listPets query', req.query)),
         tap(req => console.log('listPets body', req.body)),
         // tap(req => console.log('listPets settimeout', req.setTimeout)),
         map(req =>

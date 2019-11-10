@@ -8,15 +8,15 @@ import { tryCatch } from './utils/task-utils/try-catch';
 export type Methods = 'get' | 'post' | 'put';
 
 
-export interface ValidatedRequest<Spec extends EndpointSpec> extends Request {
+export interface ValidatedRequest<SpecOptions extends EndpointSpecOptions> extends Request {
     /** TODO: add docs from restify. */
-    query: QueryParamsFromSpec<Spec>;
+    query: QueryParamsFromSpec<SpecOptions>;
 
     /** TODO: add docs from restify. */
-    body: BodyFromSpec<Spec>;
+    body: BodyFromSpec<SpecOptions>;
 
     /** TODO: add docs from restify. */
-    params: ParamsFromSpec<Spec>;
+    params: ParamsFromSpec<SpecOptions>;
 }
 
 type EndpointResponse <
@@ -44,21 +44,21 @@ interface Stringable {
     toString (): string;
 }
 
-type QueryParamsFromSpec <Spec extends EndpointSpec> =
-    Spec['options']['queryParams'] extends object
-        ? Spec['options']['queryParams']
+type QueryParamsFromSpec <SpecOptions extends EndpointSpecOptions> =
+    SpecOptions['queryParams'] extends object
+        ? SpecOptions['queryParams']
         : {}
 ;
 
-type BodyFromSpec <Spec extends EndpointSpec> =
-    Spec['options']['body'] extends object
-        ? Spec['options']['body']['data']
+type BodyFromSpec <SpecOptions extends EndpointSpecOptions> =
+    SpecOptions['body'] extends object
+        ? SpecOptions['body']['data']
         : {}
 ;
 
-type ParamsFromSpec <Spec extends EndpointSpec> =
-    Spec['options']['pathParams'] extends object
-        ? Spec['options']['pathParams']
+type ParamsFromSpec <SpecOptions extends EndpointSpecOptions> =
+    SpecOptions['pathParams'] extends object
+        ? SpecOptions['pathParams']
         : {}
 ;
 
@@ -204,7 +204,7 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             routesDefinitions.forEach(definition => registerRoute(definition as Endpoints));
         }
 
-        function validateRequest <Spec extends EndpointSpec> (contracts: RouteContracts, req: Request): Task<ValidatedRequest<Spec>, any> {
+        function validateRequest <Spec extends EndpointSpec> (contracts: RouteContracts, req: Request): Task<ValidatedRequest<Spec['options']>, any> {
             return Task.resolve(req).pipe(
                 tryCatch(
                     req => Object.assign(
@@ -228,7 +228,7 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             Method extends Methods,
             Route extends PossibleEndpoints<Spec, Method>
         > =
-            (req: Task<ValidatedRequest<Spec[Method][Route]>, any>) => EndpointResponse<Spec, Method, Route>
+            (req: Task<ValidatedRequest<Spec[Method][Route]['options']>, any>) => EndpointResponse<Spec, Method, Route>
         ;
         function createValidatedEndpoint <M extends Methods, R extends PossibleEndpoints<Spec, M>> (method: M, route: R, cb: RequestHandler<Spec, M, R>): RouteDefinition<Spec, M, R> {
             return {

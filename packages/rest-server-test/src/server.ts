@@ -9,13 +9,20 @@ export type Methods = 'get' | 'post' | 'put';
 
 
 export interface ValidatedRequest<SpecOptions extends EndpointSpecOptions> extends Request {
-    /** TODO: add docs from restify. */
+    /**
+     * The parsed and validated query parameters. The ones that goes after the "?"
+     */
     query: QueryParamsFromSpec<SpecOptions>;
 
-    /** TODO: add docs from restify. */
+    /**
+     * The parsed and validated body
+     */
     body: BodyFromSpec<SpecOptions>;
 
-    /** TODO: add docs from restify. */
+    /**
+     * The validated url params. For example, if your url is: /pets/{petId}, then you'd have a petId url
+     * param.
+     */
     params: ParamsFromSpec<SpecOptions>;
 }
 

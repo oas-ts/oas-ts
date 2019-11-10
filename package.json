@@ -2,7 +2,8 @@
   "name": "oas-ts",
   "private": true,
   "scripts": {
-    "precommit": "lerna run build && lerna run lint",
+    "precommit-disabled": "lerna run build && lerna run lint",
+    "precommit": "lerna run build",
     "commitmsg": "validate-commit-msg"
   },
   "devDependencies": {

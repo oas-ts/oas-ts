@@ -16,10 +16,12 @@
   ],
   "dependencies": {
     "parmenides": "0.1.0",
-    "restify": "^7.2.3"
+    "restify": "^7.2.3",
+    "@ts-task/utils": "^1.0.1"
   },
   "devDependencies": {
-    "@types/restify": "^7.2.6"
+    "@types/restify": "^7.2.6",
+    "ts-node-dev": "^1.0.0-pre.32"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1",
     "start": "node lib/index",
     "build": "tsc",
+    "watch": "ts-node-dev --respawn src/index.ts",
     "lint": "tslint --project tsconfig.json"
   },
   "bugs": {

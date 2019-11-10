@@ -6,9 +6,6 @@ import { default as createRest, petContract } from './pet-spec';
 import { tap } from './utils/task-utils/tap';
 
 
-// TODO: maybe experiment with also adding a RegisterGet/RegisterPost helpers that register
-// the route for you (probably at the expense of knowing if you registered them all)
-// Could also add that as a warning in runtime from having the spec
 const rest = createRest();
 
 const ping = rest.get('/ping', treq => treq.map(_ => 'pong'));
@@ -49,6 +46,7 @@ const listPets = rest.get('/pets', treq =>
 
 const getPet = rest.get('/pets/{petId}', treq =>
     treq.pipe(
+        // tap(req => console.log('getPet body', req.body)),
         tap(req => console.log('getPet {petId}', req.params.petId, typeof req.params.petId)),
         chain(req => {
             const pet = pets.find(aPet => aPet.id === req.params.petId);
@@ -122,9 +120,6 @@ const getLastPetId = <T extends {id: number}>(pets: T[]) =>
             .sort(desc)
     )
 ;
-
-
-
 
 
 rest.registerAllRoutes([

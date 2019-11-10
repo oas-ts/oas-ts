@@ -7,7 +7,6 @@ import { BadRequestError, HttpError } from './http-errors';
 import { tryCatch } from './utils/task-utils/try-catch';
 export type Methods = 'get' | 'post' | 'put';
 
-
 export interface ValidatedRequest<SpecOptions extends EndpointSpecOptions> extends Request {
     /**
      * The parsed and validated query parameters. The ones that goes after the "?"
@@ -30,7 +29,10 @@ type EndpointResponse <
     Spec extends ServerSpec,
     Method extends Methods,
     Route extends PossibleEndpoints<Spec, Method>
-> = Task<Spec[Method][Route]['responses']['success']['json'], Spec[Method][Route]['responses']['error']['json'] | UnknownError>;
+> = Task<
+        Spec[Method][Route]['responses']['success']['json'],
+        Spec[Method][Route]['responses']['error']['json'] | UnknownError
+    >;
 
 
 export interface RouteDefinition
@@ -39,12 +41,10 @@ export interface RouteDefinition
     , Route extends PossibleEndpoints<Spec, Verb>
     > {
         verb: Verb;
-        // TODO: Ver si llamar al ultimo Route o Path
+        // TODO: See if the type should be called Route or Path
         route: Route;
         handler: (req: Request) => EndpointResponse<Spec, Verb, Route>;
 }
-
-
 
 
 interface Stringable {
@@ -120,9 +120,6 @@ type PossibleEndpoints <
 ;
 
 
-type Unbox<A extends any[]> = A extends Array<infer C> ? C : never;
-
-
 export interface MissingRoutes<R> {
     You_are_missing_a_route_definition: R;
 }
@@ -174,7 +171,7 @@ function sanitizeRoute (route: string) {
     return route.replace(/\{\w+\}/g, (str: string) => ':' + str.slice(1, -1));
 }
 
-export function createServerSomething<Spec extends ServerSpec, AllRoutes extends RouteDefinition<any, any, any>> (validation: ServerContracts) {
+export function createRest<Spec extends ServerSpec, AllRoutes extends RouteDefinition<any, any, any>> (validation: ServerContracts) {
 
     return function (_server?: Server) {
         const server = _server ? _server : configureDefaultServer();

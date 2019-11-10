@@ -1,5 +1,5 @@
 import { Contract, num, str, strictObjOf, undef } from 'parmenides';
-import { createServerSomething as createRest, RouteDefinition } from './server';
+import { createRest, RouteDefinition } from './server';
 import { arrOrSingleObjectOf } from './utils/heraclitus/arr-or-single-object-of';
 import { numberLike } from './utils/heraclitus/number-like';
 import { objectOfLike } from './utils/heraclitus/object-of-like';

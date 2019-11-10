@@ -1,17 +1,18 @@
 import { Task } from '@ts-task/task';
 import { map } from '@ts-task/task/dist/lib/src/operators';
-import { arrOf } from 'parmenides';
+import { arrOf, ContractOf } from 'parmenides';
 import { NotFoundError } from './http-errors';
 import { default as createRest, petContract } from './pet-spec';
 import { tap } from './utils/task-utils/tap';
 
 
-// TODO: experiment with also adding a get/post helpers that register
+// TODO: maybe experiment with also adding a RegisterGet/RegisterPost helpers that register
 // the route for you (probably at the expense of knowing if you registered them all)
 // Could also add that as a warning in runtime from having the spec
-const {createValidatedEndpoint, registerAllRoutes} = createRest();
+const rest = createRest();
 
-const ping = createValidatedEndpoint('get', '/ping', treq => treq.map(_ => 'pong'));
+const ping = rest.get('/ping', treq => treq.map(_ => 'pong'));
+
 
 const pets = arrOf(petContract)([{
     id: 1,
@@ -23,24 +24,30 @@ const pets = arrOf(petContract)([{
     tag: 'slow'
 }]);
 
-const listPets = createValidatedEndpoint('get', '/pets', treq =>
+type Pet = ContractOf<typeof petContract>;
+
+// If the query has a filter, show the pets who have a tag
+// in the list of tags
+const byTag = (tags: string[] | undefined, pet: Pet) =>
+    tags === undefined || pet.tag && tags.includes(pet.tag)
+;
+
+const listPets = rest.get('/pets', treq =>
     treq.pipe(
-        tap(req => console.log('listPets query', req.query)),
+        tap(req => console.log('listPets query!', req.query)),
         tap(req => console.log('listPets body', req.body)),
         // tap(req => console.log('listPets settimeout', req.setTimeout)),
         map(req =>
             pets
-                // If the query has a filter, show the pets who have a tag
-                // in the list of tags
-                .filter(pet =>
-                    req.query.tags === undefined || pet.tag && req.query.tags.includes(pet.tag))
+                // Filter and limit the request
+                .filter(pet => byTag(req.query.tags, pet))
                 .slice(0, req.query.limit)
         )
     )
 );
 
 
-const getPet = createValidatedEndpoint('get', '/pets/{petId}', treq =>
+const getPet = rest.get('/pets/{petId}', treq =>
     // TODO: refactor using pipe (tap, map, chain)
     treq.chain(req => {
         console.log('getPet {petId}', req.params.petId, typeof req.params.petId);
@@ -70,7 +77,7 @@ const getPet = createValidatedEndpoint('get', '/pets/{petId}', treq =>
 //     res.send(pet);
 // });
 
-const createPet = createValidatedEndpoint('post', '/pets', treq =>
+const createPet = rest.post('/pets', treq =>
     treq.pipe(
         // tap(req => console.log('createPet query', req.query)),
         // tap(req => console.log('createPet body', req.body)),
@@ -100,18 +107,25 @@ const createPet = createValidatedEndpoint('post', '/pets', treq =>
 //     }
 // });
 
+// Gets the head of an array or some default if there is no element
+const safeHead = <T>(_default: T, arr: T[]) => arr[0] || _default;
+
+const desc = (a: number, b: number) => b - a;
+
 const getLastPetId = <T extends {id: number}>(pets: T[]) =>
-    pets
-        .map(pet => pet.id)
-        .sort((a, b) => b - a)
-        [0] || 0
+    safeHead(
+        0,
+        pets
+            .map(pet => pet.id)
+            .sort(desc)
+    )
 ;
 
 
 
 
 
-registerAllRoutes([
+rest.registerAllRoutes([
     ping,
     listPets,
     createPet,

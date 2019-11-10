@@ -1,10 +1,10 @@
 import { Task, UnknownError } from '@ts-task/task';
-import { Request, Response, Server } from 'restify';
-import { Contract } from 'parmenides';
-import { tryCatch } from './utils/task-utils/try-catch';
-import { BadRequestError, HttpError } from './http-errors';
 import { caseError, isInstanceOf } from '@ts-task/utils';
+import { Contract } from 'parmenides';
+import { Request, Response, Server } from 'restify';
 import * as restify from 'restify';
+import { BadRequestError, HttpError } from './http-errors';
+import { tryCatch } from './utils/task-utils/try-catch';
 export type Methods = 'get' | 'post' | 'put';
 
 
@@ -117,11 +117,11 @@ type Unbox<A extends any[]> = A extends Array<infer C> ? C : never;
 
 
 export interface MissingRoutes<R> {
-    You_are_missing_a_route_definition: R
+    You_are_missing_a_route_definition: R;
 }
 
 export interface ExtraRoutes<R> {
-    You_have_extra_methods: R
+    You_have_extra_methods: R;
 }
 
 type ExpectAllRoutes<ProvidedRoutes, AllRoutes> =
@@ -136,7 +136,7 @@ type RouteContracts = {
     queryParams: Contract<any>;
     pathParams: Contract<any>;
     body: Contract<any>;
-}
+};
 
 type ServerContracts = {
     get: {
@@ -148,7 +148,7 @@ type ServerContracts = {
     put: {
         [route: string]: RouteContracts
     };
-}
+};
 
 function configureDefaultServer () {
     const server = restify.createServer();
@@ -164,7 +164,7 @@ function configureDefaultServer () {
 }
 
 function sanitizeRoute (route: string) {
-    return route.replace(/\{\w+\}/g, (str: string) => ':' + str.slice(1, -1))
+    return route.replace(/\{\w+\}/g, (str: string) => ':' + str.slice(1, -1));
 }
 
 export function createServerSomething<Spec extends ServerSpec, AllRoutes extends RouteDefinition<any, any, any>> (validation: ServerContracts) {
@@ -184,7 +184,7 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
                             console.error(err);
                             res.send(500, {
                                 message: 'Oh snaps'
-                            })
+                            });
                         },
                         val => {
                             if (val instanceof HttpError) {
@@ -223,14 +223,14 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             );
         }
 
-        type SomethingValidated<
+        type RequestHandler<
             Spec extends ServerSpec,
             Method extends Methods,
             Route extends PossibleEndpoints<Spec, Method>
         > =
             (req: Task<ValidatedRequest<Spec[Method][Route]>, any>) => EndpointResponse<Spec, Method, Route>
         ;
-        function createValidatedEndpoint <M extends Methods, R extends PossibleEndpoints<Spec, M>> (method: M, route: R, cb: SomethingValidated<Spec, M, R>): RouteDefinition<Spec, M, R> {
+        function createValidatedEndpoint <M extends Methods, R extends PossibleEndpoints<Spec, M>> (method: M, route: R, cb: RequestHandler<Spec, M, R>): RouteDefinition<Spec, M, R> {
             return {
                 verb: method,
                 route,
@@ -238,9 +238,18 @@ export function createServerSomething<Spec extends ServerSpec, AllRoutes extends
             };
         }
 
+        function get <R extends PossibleEndpoints<Spec, 'get'>> (route: R, handler: RequestHandler<Spec, 'get', R>): RouteDefinition<Spec, 'get', R> {
+            return createValidatedEndpoint('get', route, handler);
+        }
+
+        function post <R extends PossibleEndpoints<Spec, 'post'>> (route: R, handler: RequestHandler<Spec, 'post', R>): RouteDefinition<Spec, 'post', R> {
+            return createValidatedEndpoint('post', route, handler);
+        }
+
         return {
             registerRoute,
-            createValidatedEndpoint,
+            post,
+            get,
             registerAllRoutes
         };
     };

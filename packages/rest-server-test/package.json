@@ -32,6 +32,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1",
     "start": "node lib/index",
     "build": "tsc",
+    "build-watch": "tsc -w",
     "watch": "ts-node-dev --respawn src/index.ts",
     "lint": "tslint --project tsconfig.json"
   },

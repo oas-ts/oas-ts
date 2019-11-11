@@ -20,7 +20,8 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "build-watch": "tsc -w"
   },
   "bugs": {
     "url": "https://github.com/oas-ts/oas-ts/issues"

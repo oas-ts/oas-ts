@@ -200,8 +200,9 @@ export function mapEachRoute<T> (spec: OpenAPI, cb: (url: string, verb: Verb, op
             .reduce((internalArray, verb) => {
                 // Call the callback and append the result into an array
                 const op = spec.paths[url][verb];
-                if (typeof op === 'undefined') return internalArray;
-                internalArray.push(cb(url, verb, op));
+                if (typeof op !== 'undefined') {
+                    internalArray.push(cb(url, verb, op));
+                }
                 return internalArray;
             }, [] as T[]))
         ,

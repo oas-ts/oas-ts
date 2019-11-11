@@ -16,6 +16,8 @@ $ git clone https://github.com/oas-ts/oas-ts
 $ cd oas-ts
 $ lerna bootstrap
 $ lerna run build
+# or watch and build
+$ lerna run --parallel build-watch
 ```
 
 To run the backend example you can execute

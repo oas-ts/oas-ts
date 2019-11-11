@@ -31,6 +31,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "tsc",
+    "build-watch": "tsc -w",
     "lint": "tslint --project tsconfig.json",
     "generator": "npm run build && node lib/generator > __tests__/generated/pet-spec.ts"
   },

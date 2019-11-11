@@ -84,6 +84,7 @@ export type EndpointSpecOptions = {
 };
 
 export interface EndpointSpec {
+    // TODO: rename to request
     options: EndpointSpecOptions;
 
     responses: {
@@ -169,6 +170,7 @@ function sanitizeRoute (route: string) {
     return route.replace(/\{\w+\}/g, (str: string) => ':' + str.slice(1, -1));
 }
 
+// TODO: rename to createRestServer
 export function createRest<Spec extends ServerSpec, AllRoutes extends RouteDefinition<any, any, any>> (validation: ServerContracts) {
 
     return function (_server?: Server) {

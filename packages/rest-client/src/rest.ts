@@ -15,18 +15,22 @@ export type EndpointSpecOptions = {
     body?: {
         contentType: string;
         data: unknown;
-        // data: {
-        //     [prop: string]: unknown;
-        // }
     };
 } | undefined;
 
 export interface EndpointSpec {
+    // TODO: rename to request
     options: EndpointSpecOptions;
 
     responses: {
-        code: number;
-        json: unknown;
+        success: {
+            code: number;
+            json: unknown;
+        };
+        error: {
+            code: number;
+            json: unknown;
+        };
     };
 }
 
@@ -34,7 +38,7 @@ interface EndpointSpecs {
     [path: string]: EndpointSpec;
 }
 
-export interface RestifyEndpoints {
+export interface ClientSpec {
     get: EndpointSpecs;
     post: EndpointSpecs;
     put: EndpointSpecs;
@@ -45,7 +49,7 @@ interface RestifyOptions {
     servers: string;
 }
 
-type Endpoint <Spec extends RestifyEndpoints, Method extends Methods>
+type Endpoint <Spec extends ClientSpec, Method extends Methods>
     = <Route extends PossibleEndpoints<Spec, Method>> (url: Route, ...options: EndpointOptions<Spec, Method, Route>) => EndpointResponse<Spec, Method, Route>
 ;
 
@@ -92,7 +96,7 @@ function normalizeHeaders (options: EndpointSpecOptions): HeadersInit {
     };
 }
 
-export function restify<Spec extends RestifyEndpoints> (restifyOptions: RestifyOptions) {
+export function restify<Spec extends ClientSpec> (restifyOptions: RestifyOptions) {
     function request (method: Methods) {
         return function (path: string, options: EndpointSpecOptions) {
             const url = restifyOptions.servers + replacePath(path, options);
@@ -115,20 +119,23 @@ export function restify<Spec extends RestifyEndpoints> (restifyOptions: RestifyO
 type Methods = 'get' | 'post' | 'put' | 'delete';
 
 type EndpointResponse <
-    Spec extends RestifyEndpoints,
+    Spec extends ClientSpec,
     Method extends Methods,
     Route extends PossibleEndpoints<Spec, Method>
-> = Task<Spec[Method][Route]['responses']['json'], TypeError>;
+> = Task<
+        Spec[Method][Route]['responses']['success']['json'],
+        Spec[Method][Route]['responses']['error']['json']
+    >;
 
 type PossibleEndpoints <
-    Spec extends RestifyEndpoints,
+    Spec extends ClientSpec,
     Method extends Methods
 > =
     keyof Spec[Method]
 ;
 
 type EndpointOptions <
-    Spec extends RestifyEndpoints,
+    Spec extends ClientSpec,
     Method extends Methods,
     Route extends PossibleEndpoints<Spec, Method>
 > =

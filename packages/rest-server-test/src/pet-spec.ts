@@ -143,8 +143,8 @@ export interface PetsEndpoints extends ServerSpec  {
                 }
             },
             responses: {
-                 // If there are more than one error it should be an union
-             success: {
+                // If there are more than one error it should be an union
+                success: {
                     code: 200;
                     json: Pet;
                 },

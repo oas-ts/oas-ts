@@ -1,9 +1,8 @@
+import { arrOrSingleObjectOf, optional } from '@oas-ts/utils';
 import { Contract, num, str, strictObjOf, undef } from 'parmenides';
-import { createRest, RouteDefinition } from './server';
-import { arrOrSingleObjectOf } from './utils/heraclitus/arr-or-single-object-of';
-import { numberLike } from './utils/heraclitus/number-like';
-import { objectOfLike } from './utils/heraclitus/object-of-like';
-import { optional } from './utils/parmenides-pr/optional';
+import { numberLike } from '../../utils/src/heraclitus/number-like';
+import { objectOfLike } from '../../utils/src/heraclitus/object-of-like';
+import { createRest, RouteDefinition, ServerSpec } from './server';
 
 // IMPORTANT TODO:  I should have a way in the specification that x error extends HttpErrors
 import { BadRequestError, NotFoundError } from './http-errors';
@@ -59,7 +58,7 @@ export interface UnknownResponseError {
     message: string;
 }
 
-export interface PetsEndpoints {
+export interface PetsEndpoints extends ServerSpec  {
     put: {
     };
     get: {

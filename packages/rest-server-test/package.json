@@ -17,7 +17,8 @@
   "dependencies": {
     "parmenides": "0.1.0",
     "restify": "^7.2.3",
-    "@ts-task/utils": "^1.0.1"
+    "@ts-task/utils": "^1.0.1",
+    "@oas-ts/utils": "0.0.0"
   },
   "devDependencies": {
     "@types/restify": "^7.2.6",

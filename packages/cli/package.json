@@ -10,6 +10,7 @@
     "@ts-task/fetch": "^1.0.6",
     "@ts-task/fs": "^1.0.1",
     "@oas-ts/rest-client": "0.0.0",
+    "@oas-ts/utils": "0.0.0",
     "ramda": "^0.26.1",
     "parmenides": "^0.1.0"
   },

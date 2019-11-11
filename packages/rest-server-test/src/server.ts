@@ -1,10 +1,10 @@
+import { tryCatch } from '@oas-ts/utils';
 import { Task, UnknownError } from '@ts-task/task';
 import { caseError, isInstanceOf } from '@ts-task/utils';
 import { Contract } from 'parmenides';
 import { Request, Response, Server } from 'restify';
 import * as restify from 'restify';
 import { BadRequestError, HttpError } from './http-errors';
-import { tryCatch } from './utils/task-utils/try-catch';
 export type Methods = 'get' | 'post' | 'put';
 
 export interface ValidatedRequest<SpecOptions extends EndpointSpecOptions> extends Request {
@@ -79,9 +79,7 @@ export type EndpointSpecOptions = {
     };
     body?: {
         contentType: string;
-        data: {
-            [prop: string]: unknown;
-        }
+        data: unknown
     };
 };
 
@@ -104,7 +102,7 @@ interface EndpointSpecs {
     [path: string]: EndpointSpec;
 }
 
-interface ServerSpec {
+export interface ServerSpec {
     get: EndpointSpecs;
     post: EndpointSpecs;
     put: EndpointSpecs;

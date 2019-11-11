@@ -1,6 +1,7 @@
+import { oneOf } from '@oas-ts/utils';
 import { readFile } from '@ts-task/fs';
 import { Task } from '@ts-task/task';
-import { anything, arrOf, bool, ContractOf, dictionaryOf, lit, objOf, oneOf, optional, str, union } from 'parmenides';
+import { anything, arrOf, bool, ContractOf, dictionaryOf, lit, objOf, optional, str, union } from 'parmenides';
 import { join } from 'path';
 
 class InvalidApiSpec {

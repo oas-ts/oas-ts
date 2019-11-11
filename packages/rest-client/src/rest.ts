@@ -14,9 +14,10 @@ export type EndpointSpecOptions = {
     };
     body?: {
         contentType: string;
-        data: {
-            [prop: string]: unknown;
-        }
+        data: unknown;
+        // data: {
+        //     [prop: string]: unknown;
+        // }
     };
 } | undefined;
 

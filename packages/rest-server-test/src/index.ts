@@ -1,9 +1,9 @@
+import { tap } from '@oas-ts/utils';
 import { Task } from '@ts-task/task';
 import { chain, map } from '@ts-task/task/dist/lib/src/operators';
 import { ContractOf } from 'parmenides';
 import { NotFoundError } from './http-errors';
 import { default as createRest, petContract } from './pet-spec';
-import { tap } from './utils/task-utils/tap';
 
 
 const rest = createRest();

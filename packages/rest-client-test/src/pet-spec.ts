@@ -12,10 +12,11 @@ export interface Pet {
     tag?: string;
 }
 
-// TODO: add these types
+// TODO: add these types and their validation
 type BadRequestError = {};
 type NotFoundError = {};
 
+// TODO: Rename to ServerError? or not?
 export interface UnknownResponseError {
     code: number;
     message: string;

@@ -11,7 +11,6 @@ const showPet = (pet: Pet) =>
 
 rest.get('/pets/{petId}', {
     pathParams: {
-        // TODO: fix NotFound
         petId: 10
     }
 }).fork(

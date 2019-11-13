@@ -1,5 +1,5 @@
 import { fetch } from '@ts-task/fetch';
-import { Task } from '@ts-task/task';
+import { Task, UnknownError } from '@ts-task/task';
 
 export interface Stringable {
     toString (): string;
@@ -96,6 +96,7 @@ function normalizeHeaders (options: EndpointSpecOptions): HeadersInit {
     };
 }
 
+// TODO: rename to createRestClient
 export function restify<Spec extends ClientSpec> (restifyOptions: RestifyOptions) {
     function request (method: Methods) {
         return function (path: string, options: EndpointSpecOptions) {
@@ -104,7 +105,15 @@ export function restify<Spec extends ClientSpec> (restifyOptions: RestifyOptions
                 method,
                 body: normalizeBody(options),
                 headers: normalizeHeaders(options)
-            }).chain(res => res.json());
+            })
+            .chain(res =>
+
+             res.json().chain(
+                 obj => res.ok
+                 ? Task.resolve(obj)
+                 : Task.reject(obj)
+             )
+            );
         };
 
     }
@@ -124,7 +133,7 @@ type EndpointResponse <
     Route extends PossibleEndpoints<Spec, Method>
 > = Task<
         Spec[Method][Route]['responses']['success']['json'],
-        Spec[Method][Route]['responses']['error']['json']
+        Spec[Method][Route]['responses']['error']['json'] | UnknownError // TODO: this is not being validated
     >;
 
 type PossibleEndpoints <
